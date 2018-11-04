@@ -1,105 +1,103 @@
 <template>
-  <div class="container" @click="clickHandle('test click', $event)">
-
-    <div class="userinfo" @click="bindViewTap">
-      <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover" />
-      <div class="userinfo-nickname">
-        <card :text="userInfo.nickName"></card>
-      </div>
-    </div>
-
-    <div class="usermotto">
-      <div class="user-motto">
-        <card :text="motto"></card>
-      </div>
-    </div>
-
-    <form class="form-container">
-      <input type="text" class="form-control" v-model="motto" placeholder="v-model" />
-      <input type="text" class="form-control" v-model.lazy="motto" placeholder="v-model.lazy" />
-    </form>
-    <a href="/pages/counter/main" class="counter">去往Vuex示例页面</a>
+  <div class="container">
+    <div>{{pickerText}}</div>
+    <button @click="handleShowSinglePicker">单列选择</button>
+    <button @click="handleShowMultiPicker">多列选择</button>
+    <button @click="handleShowLinkagePicker">联动选择</button>
+    <mpvue-picker ref="genderPicker" :items="genders" :values="singleValues" themeColor="#FF0000" @bind-confirm="confirmSingle"></mpvue-picker>
+    <mpvue-picker ref="multiPicker" :items="multiArray" :values="multiValues" themeColor="#FF0000" @bind-confirm="confirmMulti"></mpvue-picker>
+    <mpvue-picker ref="linkagePicker" :items="linkageArray" :linkage="true" :deep="3" :values="linkageValues" themeColor="#FF0000" @bind-confirm="confirmLinkage"></mpvue-picker>
   </div>
 </template>
 
 <script>
-import card from '@/components/card';
+  import MpvuePicker from '@/components/MpvuePicker';
 
-export default {
-  data() {
-    return {
-      motto: 'Hello World',
-      userInfo: {},
-    };
-  },
+  const regions = require('../../dicts/regions.json');
 
-  components: {
-    card,
-  },
-
-  methods: {
-    bindViewTap() {
-      const url = '../logs/main';
-      wx.navigateTo({ url });
+  export default {
+    components: {
+      MpvuePicker,
     },
-    getUserInfo() {
-      // 调用登录接口
-      wx.login({
-        success: () => {
-          wx.getUserInfo({
-            success: (res) => {
-              this.userInfo = res.userInfo;
-            },
-          });
-        },
-      });
+    data() {
+      return {
+        singleValues: [0],
+        multiValues: [0, 0, 0],
+        linkageValues: [0, 0, 0],
+        pickerText: '',
+        genders: [
+          [
+            { value: 1, label: '男' },
+            { value: 2, label: '女' },
+          ],
+        ],
+        multiArray: [
+          [
+            { value: 1, label: '男' },
+            { value: 2, label: '女' },
+          ],
+          [
+            { value: 1, label: 'A' },
+            { value: 2, label: 'B' },
+            { value: 3, label: 'C' },
+            { value: 4, label: 'D' },
+            { value: 5, label: 'E' },
+            { value: 6, label: 'F' },
+          ],
+          [
+            { value: 1, label: '甲' },
+            { value: 2, label: '乙' },
+            { value: 2, label: '丙' },
+            { value: 2, label: '丁' },
+            { value: 2, label: '戊' },
+            { value: 2, label: '己' },
+            { value: 2, label: '庚' },
+            { value: 2, label: '辛' },
+          ],
+        ],
+        linkageArray: regions,
+      };
     },
-    clickHandle(msg, ev) {
-      console.log('clickHandle:', msg, ev);
+    onShow() {
+      console.log(regions);
     },
-  },
-
-  created() {
-    // 调用应用实例的方法获取全局数据
-    this.getUserInfo();
-  },
-};
+    methods: {
+      handleShowSinglePicker() {
+        this.$refs.genderPicker.show();
+      },
+      handleShowMultiPicker() {
+        this.$refs.multiPicker.show();
+      },
+      handleShowLinkagePicker() {
+        this.$refs.linkagePicker.show();
+      },
+      confirmSingle(e) {
+        console.log('picker confirm emit');
+        console.dir(e);
+        this.singleValues = e.indexes;
+        console.log(this.singleValues);
+        this.pickerText = e.labels.join(' - ');
+      },
+      confirmMulti(e) {
+        console.log('picker confirm emit');
+        console.dir(e);
+        this.multiValues = e.indexes;
+        console.log(this.multiValues);
+        this.pickerText = e.labels.join(' - ');
+      },
+      confirmLinkage(e) {
+        console.log('picker confirm emit');
+        console.dir(e);
+        this.linkageValues = e.indexes;
+        console.log(this.linkageValues);
+        this.pickerText = e.labels.join(' - ');
+      },
+    },
+    created() {
+    },
+  };
 </script>
 
 <style scoped>
-.userinfo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
-.userinfo-avatar {
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
-  border-radius: 50%;
-}
-
-.userinfo-nickname {
-  color: #aaa;
-}
-
-.usermotto {
-  margin-top: 150px;
-}
-
-.form-control {
-  display: block;
-  padding: 0 12px;
-  margin-bottom: 5px;
-  border: 1px solid #ccc;
-}
-
-.counter {
-  display: inline-block;
-  margin: 10px auto;
-  padding: 5px 10px;
-  color: blue;
-  border: 1px solid blue;
-}
 </style>
